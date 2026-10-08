@@ -13,6 +13,15 @@
   .hero img { display: block; width: 100%; height: 100svh; object-fit: cover; object-position: center; }
   header { position: absolute; z-index: 2; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start; min-height: 3.6rem; padding: 0.6rem 1rem; }
   a { color: #f6f1e8; text-decoration: none; }
+
+  .marks { display: flex; align-items: center; gap: 0.4rem; min-width: 0; overflow-x: auto; }
+  .marks img { height: 1.5rem; width: auto; mix-blend-mode: screen; flex: none; }
+  .marks img.sm { height: 1.1rem; }
+  .marks .rule { width: 1px; height: 0.95rem; background: rgb(246 241 232 / 0.28); flex: none; }
+  .marks .ae { font-style: italic; font-weight: 500; font-size: 1.05rem; line-height: 1; }
+  .marks .word { display: flex; flex-direction: column; line-height: 0.9; flex: none; }
+  .marks .word b { font-style: italic; font-weight: 500; font-size: 1.2rem; }
+  .marks .word small { font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; }
   .mark { display: flex; flex-direction: column; line-height: 0.9; }
   .mark b { font-style: italic; font-weight: 500; font-size: 1.55rem; }
   .mark small { font-style: normal; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.85; }
@@ -31,7 +40,7 @@
   <img alt="Eternal Sun 盛明" src="/sun.jpg">
   <div class="scrim"></div>
   <header>
-    <a class="mark" href="/"><b>AE</b><small>Universe</small></a>
+    <a class="marks" href="/" aria-label="AE Universe Creation"><img src="/brand/three-rings.webp" alt=""><span class="rule"></span><span style="display:flex;align-items:center;gap:0.28rem;flex:none"><img class="sm" src="/brand/three-rings.webp" alt=""><span class="ae">AE</span></span><span class="rule"></span><span class="word"><b>AE</b><small>Universe</small></span></a>
     <nav>
       <a href="/studio.html">桌布</a>
       <a href="/gallery.html">Gallery</a>

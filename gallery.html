@@ -10,6 +10,15 @@
   html, body { margin: 0; background: #100e0c; color: #f6f1e8; }
   body { font-family: "PingFang TC", "Noto Sans TC", sans-serif; }
   header { display: flex; align-items: center; justify-content: space-between; min-height: 4.25rem; padding: 0 1.35rem; }
+
+  .marks { display: flex; align-items: center; gap: 0.4rem; min-width: 0; overflow-x: auto; }
+  .marks img { height: 1.5rem; width: auto; mix-blend-mode: screen; flex: none; }
+  .marks img.sm { height: 1.1rem; }
+  .marks .rule { width: 1px; height: 0.95rem; background: rgb(246 241 232 / 0.28); flex: none; }
+  .marks .ae { font-style: italic; font-weight: 500; font-size: 1.05rem; line-height: 1; }
+  .marks .word { display: flex; flex-direction: column; line-height: 0.9; flex: none; }
+  .marks .word b { font-style: italic; font-weight: 500; font-size: 1.2rem; }
+  .marks .word small { font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; }
   .mark { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 0.12rem; }
   .mark span { font-family: Palatino, "Songti TC", serif; font-style: italic; font-size: 1.7rem; line-height: 0.85; }
   .mark small { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; font-style: normal; }
@@ -25,7 +34,7 @@
   .zh { margin: 0.3rem 0 0; color: #cbbba6; font-family: Palatino, "Songti TC", serif; font-style: italic; }
 </style></head><body>
 <header>
-  <a class="mark" href="/"><span>AE</span><small>Universe</small></a>
+  <a class="marks" href="/" aria-label="AE Universe Creation"><img src="/brand/three-rings.webp" alt=""><span class="rule"></span><span style="display:flex;align-items:center;gap:0.28rem;flex:none"><img class="sm" src="/brand/three-rings.webp" alt=""><span class="ae">AE</span></span><span class="rule"></span><span class="word"><b>AE</b><small>Universe</small></span></a>
   <nav>
     <a href="/gallery.html">Gallery</a>
       <a href="/studio.html">桌布</a>
