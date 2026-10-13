@@ -8,28 +8,28 @@
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #100e0c; color: #f6f1e8; }
-  body { min-height: 100svh; font-family: Palatino, "Iowan Old Style", "Songti TC", serif; }
+  body { min-height: 100svh; font-family: Palatino, "Songti TC", serif; }
   a { color: inherit; }
-  main { min-height: 100svh; padding: 4.6rem 1.15rem 2.2rem; }
-  header { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1.15rem; }
+  header { display: flex; justify-content: space-between; padding: 0.9rem 1.15rem; }
   header a { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; }
-  .brand { margin: 0; font-size: 2.4rem; font-style: italic; line-height: 0.9; }
-  .sub { margin: 0.45rem 0 0; color: #d4b483; font-family: "PingFang TC", sans-serif; font-size: 0.72rem; letter-spacing: 0.14em; }
-  .field { position: relative; height: 46vw; max-height: 280px; min-height: 210px; margin: 1.3rem auto 0.4rem; }
-  .sun { position: absolute; left: 50%; top: 50%; width: 42%; height: 74%; transform: translate(-50%, -50%); border-radius: 50%; background: url("/sun.jpg") center / cover; box-shadow: 0 0 40px rgb(226 194 122 / 0.35); }
-  .ring { position: absolute; left: 50%; top: 50%; width: 78%; height: 78%; border: 1px solid rgb(226 194 122 / 0.35); border-radius: 50%; transform: translate(-50%, -50%); animation: spin 28s linear infinite; }
-  .dot { position: absolute; width: 14px; height: 14px; margin: -7px; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
-  .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
-  button, .go { font-family: "PingFang TC", sans-serif; }
-  .chip, .go { min-height: 2.75rem; border: 0; background: transparent; color: #f6f1e8; }
-  .chip { border-bottom: 1px solid rgb(246 241 232 / 0.25); padding: 0 0.15rem; font-size: 0.95rem; }
-  .chip.on { border-color: #e6c98a; color: #e6c98a; }
-  .row { display: flex; flex-wrap: wrap; gap: 0.8rem 1.1rem; margin-top: 1rem; }
-  .go { border-bottom: 1px solid rgb(246 241 232 / 0.6); letter-spacing: 0.14em; font-size: 0.78rem; text-transform: uppercase; padding: 0; text-decoration: none; }
-  .note { margin: 1.1rem 0 0; color: #cbbba6; font-family: "PingFang TC", sans-serif; font-size: 0.82rem; line-height: 1.55; }
-  .count { margin: 0.8rem 0 0; font-size: 0.78rem; letter-spacing: 0.12em; color: #d4b483; }
-  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
+  main { padding: 0.2rem 1.15rem 2.4rem; }
+  h1 { margin: 0; font-size: 2.6rem; font-style: italic; font-weight: 500; line-height: 0.9; }
+  .lead { margin: 0.7rem 0 0; font-family: "PingFang TC", sans-serif; font-size: 1rem; line-height: 1.5; }
+  .line { display: flex; flex-wrap: wrap; gap: 0.35rem 0.45rem; margin: 1rem 0 0; min-height: 1.6rem; }
+  .line b { font-weight: 500; color: #e6c98a; }
+  .line span { color: #8a8175; }
+  .words { display: grid; gap: 0.45rem; margin-top: 1.15rem; }
+  .word, .go { font-family: "PingFang TC", sans-serif; color: #f6f1e8; background: transparent; border: 0; text-align: left; }
+  .word { display: flex; justify-content: space-between; min-height: 2.9rem; padding: 0.35rem 0; border-bottom: 1px solid rgb(246 241 232 / 0.18); font-size: 1.05rem; }
+  .word small { color: #b7aa9a; font-size: 0.82rem; }
+  .word.on { color: #e6c98a; }
+  .go { margin-top: 1.15rem; min-height: 2.9rem; padding: 0; border-bottom: 1px solid #e6c98a; letter-spacing: 0.12em; font-size: 0.92rem; }
+  .next { margin-top: 1.1rem; }
+  .next p { margin: 0; font-family: "PingFang TC", sans-serif; line-height: 1.55; }
+  .row { display: flex; gap: 1.2rem; }
+  .card { display: block; width: min(100%, 280px); margin-top: 0.9rem; }
+  .hint { margin-top: 0.45rem; color: #b7aa9a; font-family: "PingFang TC", sans-serif; font-size: 0.78rem; }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -38,36 +38,150 @@
   <a href="/gallery.html">Gallery</a>
 </header>
 <main>
-  <p class="brand">留光</p>
-  <p class="sub">LEAVE A LIGHT · AE UNIVERSE CREATION</p>
-  <div class="field" id="field"><div class="sun"></div><div class="ring" id="ring"></div></div>
-  <p class="count" id="count">這一條還沒有光。</p>
-  <div class="chips" id="chips"></div>
-  <div class="row">
-    <button class="go" id="leave" type="button">留下這點光</button>
-    <button class="go" id="card" type="button">收下卡片</button>
-    <button class="go" id="wall" type="button">收下桌布</button>
-    <button class="go" id="pass" type="button">傳給朋友</button>
-  </div>
-  <p class="note">朋友打開你的連結，可以在同一條光上再留一點。光會留著，也會變長。<br>若這道光剛好，到 <a href="https://www.instagram.com/aeuniversecreation/">IG</a> 按一個讚。</p>
+  <h1>留光</h1>
+  <p class="lead" id="lead">選一個字，留在這條光上。</p>
+  <p class="line" id="line"></p>
+  <div class="words" id="words"></div>
+  <button class="go" id="leave" type="button">留下這個字</button>
+  <section class="next" id="next" hidden>
+    <p id="done"></p>
+    <div class="row">
+      <button class="go" id="pass" type="button">傳給一位朋友</button>
+      <button class="go" id="card" type="button">看卡片</button>
+    </div>
+    <img class="card" id="preview" alt="留光卡片" hidden>
+    <p class="hint" id="savehint" hidden>按住圖片，可以存到手機。</p>
+    <p class="hint">若這道光剛好，到 <a href="https://www.instagram.com/aeuniversecreation/">IG</a> 按一個讚。</p>
+    <button class="go" id="fresh" type="button" hidden>開一條新的</button>
+  </section>
 </main>
 <script>
-const WORDS=[["暖","#e6c98a"],["開","#f0a35e"],["安","#8fce9a"],["亮","#f6f1e8"],["近","#e7a0b4"],["續","#b9a0e0"]];
-const KEY="ae-light-chain";
-const params=new URLSearchParams(location.search);
-let lights=decode(params.get("lights")||localStorage.getItem(KEY)||"");
-let pick=0;
-const chips=document.getElementById("chips");
-WORDS.forEach((word,i)=>{const b=document.createElement("button");b.type="button";b.className="chip"+(i===0?" on":"");b.textContent=word[0];b.onclick=()=>{pick=i;[...chips.children].forEach((el,n)=>el.classList.toggle("on",n===i));};chips.appendChild(b);});
-function decode(raw){if(!raw)return[];return raw.split(",").map(part=>{const [w,c]=part.split(".");const n=Number(w);return {w:Number.isFinite(n)?n:0,c:c||"0"};}).filter(item=>item.w>=0&&item.w<WORDS.length).slice(-36);}
-function encode(list){return list.map(item=>item.w+"."+item.c).join(",");}
-function paint(){const ring=document.getElementById("ring");ring.querySelectorAll(".dot").forEach(el=>el.remove());lights.forEach((item,i)=>{const dot=document.createElement("i");dot.className="dot";const turn=lights.length===1?0:i/lights.length;dot.style.left=(50+Math.cos(turn*Math.PI*2)*46)+"%";dot.style.top=(50+Math.sin(turn*Math.PI*2)*46)+"%";dot.style.background=WORDS[item.w][1];dot.style.color=WORDS[item.w][1];ring.appendChild(dot);});document.getElementById("count").textContent=lights.length?"這一條上有 "+lights.length+" 點光。":"這一條還沒有光。";}
-function save(){const chain=encode(lights);localStorage.setItem(KEY,chain);history.replaceState(null,"",location.pathname+(chain?"?lights="+chain:""));}
-document.getElementById("leave").onclick=()=>{lights.push({w:pick,c:Math.random().toString(36).slice(2,6)});save();paint();};
-document.getElementById("pass").onclick=async()=>{const link=location.href;if(navigator.share){try{await navigator.share({title:"留光",text:"AE Universe Creation",url:link});return;}catch(e){}}await navigator.clipboard.writeText(link);document.getElementById("pass").textContent="連結已複製";};
-async function draw(kind){const w=1080,h=kind==="card"?1440:1920;const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;const ctx=canvas.getContext("2d");ctx.fillStyle="#100e0c";ctx.fillRect(0,0,w,h);const img=new Image();img.src="/sun.jpg";await img.decode().catch(()=>{});if(img.naturalWidth){const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight);const dw=img.naturalWidth*scale,dh=img.naturalHeight*scale;ctx.globalAlpha=.92;ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);ctx.globalAlpha=1;}const fade=ctx.createLinearGradient(0,h*.45,0,h);fade.addColorStop(0,"rgba(16,14,12,0)");fade.addColorStop(1,"rgba(16,14,12,.82)");ctx.fillStyle=fade;ctx.fillRect(0,0,w,h);ctx.fillStyle="#f6f1e8";ctx.font="italic 92px Palatino, serif";ctx.fillText("留光",80,h-280);ctx.font="36px Palatino, serif";ctx.fillStyle="#e6c98a";const mine=lights.length?WORDS[lights[lights.length-1].w][0]:WORDS[pick][0];ctx.fillText(mine+"  ·  "+lights.length+" lights",84,h-200);ctx.fillStyle="#f6f1e8";ctx.font="28px Palatino, serif";ctx.fillText("AE Universe Creation",84,h-130);const a=document.createElement("a");a.href=canvas.toDataURL("image/jpeg",.86);a.download=kind==="card"?"AE-light-card.jpg":"AE-light-wallpaper.jpg";a.click();}
-document.getElementById("card").onclick=()=>draw("card");
-document.getElementById("wall").onclick=()=>draw("wall");
+const WORDS = [
+  ["暖", "給今天", "#e6c98a"],
+  ["開", "給開始", "#f0a35e"],
+  ["安", "給停下", "#8fce9a"],
+  ["亮", "給看見", "#f6f1e8"],
+  ["近", "給一個人", "#e7a0b4"],
+  ["續", "還會回來", "#b9a0e0"]
+];
+const KEY = "ae-light-v2";
+const params = new URLSearchParams(location.search);
+const fromLink = params.has("lights");
+let lights = decode(fromLink ? params.get("lights") : localStorage.getItem(KEY) || "");
+let pick = 0;
+const mine = localStorage.getItem(KEY + "-mine") || "";
+let joined = mine && lights.some((item) => item.c === mine);
+const words = document.getElementById("words");
+WORDS.forEach((word, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "word" + (i === 0 ? " on" : "");
+  b.innerHTML = word[0] + "<small>" + word[1] + "</small>";
+  b.onclick = () => { pick = i; [...words.children].forEach((el, n) => el.classList.toggle("on", n === i)); };
+  words.appendChild(b);
+});
+function decode(raw) {
+  if (!raw) return [];
+  return raw.split(",").flatMap((part) => {
+    const [w, c] = part.split(".");
+    const n = Number(w);
+    if (!Number.isFinite(n) || n < 0 || n >= WORDS.length) return [];
+    return [{ w: n, c: c || "0" }];
+  }).slice(-6);
+}
+function encode(list) { return list.map((item) => item.w + "." + item.c).join(","); }
+function chainText() { return lights.map((item) => WORDS[item.w][0]).join(" → "); }
+function showPick(on) { words.hidden = !on; document.getElementById("leave").hidden = !on; }
+function paint() {
+  const line = document.getElementById("line");
+  const lead = document.getElementById("lead");
+  const next = document.getElementById("next");
+  const full = lights.length >= 6;
+  if (!lights.length) {
+    line.textContent = "";
+    lead.textContent = "選一個字，留在這條光上。";
+    showPick(true);
+    next.hidden = true;
+    return;
+  }
+  line.innerHTML = lights.map((item, i) => (i ? "<span>→</span>" : "") + "<b>" + WORDS[item.w][0] + "</b>").join("");
+  if (fromLink && !joined && !full) {
+    lead.textContent = "這條光已經有「" + chainText() + "」。你接一個字。";
+    showPick(true);
+    next.hidden = true;
+    return;
+  }
+  lead.textContent = full ? "六個字齊了。" : "這條光現在是「" + chainText() + "」。";
+  showPick(false);
+  next.hidden = false;
+  document.getElementById("done").textContent = full ? "這一輪可以留下。想繼續，就開一條新的。" : "傳給一位朋友，請他接下一個字。";
+  document.getElementById("fresh").hidden = !full;
+}
+function save(markMine) {
+  const chain = encode(lights);
+  localStorage.setItem(KEY, chain);
+  if (markMine) localStorage.setItem(KEY + "-mine", markMine);
+  history.replaceState(null, "", location.pathname + (chain ? "?lights=" + chain : ""));
+}
+document.getElementById("leave").onclick = () => {
+  if (lights.length >= 6) return;
+  const stamp = Math.random().toString(36).slice(2, 6);
+  lights.push({ w: pick, c: stamp });
+  joined = true;
+  save(stamp);
+  paint();
+};
+document.getElementById("pass").onclick = async () => {
+  const link = location.href;
+  const text = "AE Universe Creation 留光：" + chainText();
+  if (navigator.share) { try { await navigator.share({ title: "留光", text, url: link }); return; } catch (e) {} }
+  try { await navigator.clipboard.writeText(link); } catch (e) {}
+  document.getElementById("pass").textContent = "連結複製好了";
+};
+async function makeCard() {
+  const w = 1080, h = 1440;
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#100e0c"; ctx.fillRect(0, 0, w, h);
+  const img = new Image(); img.src = "/sun.jpg";
+  await img.decode().catch(() => {});
+  if (img.naturalWidth) {
+    const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(img, (w - img.naturalWidth * scale) / 2, (h - img.naturalHeight * scale) / 2, img.naturalWidth * scale, img.naturalHeight * scale);
+    ctx.globalAlpha = 1;
+  }
+  const fade = ctx.createLinearGradient(0, h * 0.42, 0, h);
+  fade.addColorStop(0, "rgba(16,14,12,0)");
+  fade.addColorStop(1, "rgba(16,14,12,0.88)");
+  ctx.fillStyle = fade; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#f6f1e8"; ctx.font = "italic 84px Palatino, serif"; ctx.fillText("留光", 72, h - 340);
+  ctx.fillStyle = "#e6c98a"; ctx.font = "54px Palatino, serif";
+  wrap(ctx, chainText() || "暖", 72, h - 250, 920, 68);
+  ctx.fillStyle = "#f6f1e8"; ctx.font = "28px Palatino, serif"; ctx.fillText("AE Universe Creation", 72, h - 90);
+  return canvas.toDataURL("image/jpeg", 0.86);
+}
+function wrap(ctx, text, x, y, max, line) {
+  let row = "";
+  for (const ch of text) {
+    if (ctx.measureText(row + ch).width > max) { ctx.fillText(row, x, y); y += line; row = ch; }
+    else row += ch;
+  }
+  ctx.fillText(row, x, y);
+}
+document.getElementById("card").onclick = async () => {
+  const preview = document.getElementById("preview");
+  preview.src = await makeCard();
+  preview.hidden = false;
+  document.getElementById("savehint").hidden = false;
+};
+document.getElementById("fresh").onclick = () => {
+  localStorage.removeItem(KEY);
+  localStorage.removeItem(KEY + "-mine");
+  history.replaceState(null, "", location.pathname);
+  location.reload();
+};
 paint();
 </script>
 </body>
