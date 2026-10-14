@@ -8,76 +8,128 @@
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #100e0c; color: #f6f1e8; }
-  body { min-height: 100svh; font-family: Palatino, "Iowan Old Style", "Songti TC", serif; }
-  .hero { position: relative; min-height: 100svh; overflow: hidden; background: #100e0c url('/sun.jpg') center / cover no-repeat; }
-  .hero img { display: block; width: 100%; height: 100svh; object-fit: cover; object-position: center; transform-origin: center; animation: drift 16s ease-in-out infinite alternate; }
-  .glow, .sweep, .orbit { position: absolute; pointer-events: none; z-index: 1; }
-  .glow { inset: 0; background: radial-gradient(circle at 50% 44%, rgb(255 214 110 / 0.38), transparent 46%); mix-blend-mode: screen; animation: pulse 4.2s ease-in-out infinite; }
-  .sweep { inset: -30% -10%; background: linear-gradient(115deg, transparent 42%, rgb(255 240 200 / 0.28) 50%, transparent 58%); animation: sweep 6.5s ease-in-out infinite; }
-  .orbit { top: 40%; left: 50%; width: min(78vw, 28rem); height: min(78vw, 28rem); border: 1px solid rgb(226 194 122 / 0.55); border-radius: 50%; box-shadow: 0 0 48px rgb(226 194 122 / 0.22); animation: spin 20s linear infinite; }
-  .orbit:before, .orbit:after { content: ""; position: absolute; border: 1px solid rgb(246 241 232 / 0.35); border-radius: 50%; }
-  .orbit:before { inset: 14%; }
-  .orbit:after { inset: 30%; }
-  .brand { margin: 0 0 0.45rem; max-width: 17rem; font-size: 2.15rem; font-style: italic; font-weight: 500; line-height: 0.92; background: linear-gradient(100deg, #f6f1e8 20%, #f0d48a 48%, #fff 52%, #f6f1e8 80%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 5.5s linear infinite; }
-  @keyframes drift { from { transform: scale(1); } to { transform: scale(1.08); } }
-  @keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
-  @keyframes sweep { from { transform: translateX(-35%); } to { transform: translateX(35%); } }
-  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-  @keyframes sheen { from { background-position: 120% 0; } to { background-position: -40% 0; } }
-  @media (prefers-reduced-motion: reduce) { .hero img, .glow, .sweep, .orbit, .brand { animation: none; } }
-  header { position: absolute; z-index: 2; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start; min-height: 3.6rem; padding: 0.6rem 1rem; }
-  a { color: #f6f1e8; text-decoration: none; }
-  .marks { display: flex; align-items: center; gap: 0.4rem; min-width: 0; overflow-x: auto; }
-  .marks img { height: 1.5rem; width: auto; mix-blend-mode: screen; flex: none; }
-  .marks img.sm { height: 1.1rem; }
-  .marks .rule { width: 1px; height: 0.95rem; background: rgb(246 241 232 / 0.28); flex: none; }
-  .marks .ae { font-style: italic; font-weight: 500; font-size: 1.05rem; line-height: 1; }
-  .marks .word { display: flex; flex-direction: column; line-height: 0.9; flex: none; }
-  .marks .word b { font-style: italic; font-weight: 500; font-size: 1.2rem; }
-  .marks .word small { font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; }
-  .mark { display: flex; flex-direction: column; line-height: 0.9; }
-  .mark b { font-style: italic; font-weight: 500; font-size: 1.55rem; }
-  .mark small { font-style: normal; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.85; }
-  nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem 0.7rem; max-width: 16rem; padding-top: 0.35rem; }
-  nav a { font-family: "PingFang TC", "Noto Sans TC", sans-serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.35rem 0; }
-  .scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 42%; background: linear-gradient(to top, rgb(16 14 12 / 0.55), transparent); pointer-events: none; }
-  .cap { position: absolute; left: 1.2rem; bottom: 1.6rem; z-index: 2; }
-  .eye { margin: 0; font-family: "PingFang TC", sans-serif; font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: #d4b483; }
-  h1 { margin: 0.25rem 0 0; font-size: 3.1rem; font-style: italic; font-weight: 500; line-height: 0.95; }
-  .row { display: flex; gap: 1.1rem; margin-top: 0.85rem; }
-  .enter { font-family: "PingFang TC", sans-serif; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; border-bottom: 1px solid rgb(246 241 232 / 0.55); padding: 0.35rem 0; }
-</style>
-<style>
-header{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:.25rem!important;height:auto!important;min-height:0!important;padding:.45rem .85rem .4rem!important}
-.marks{overflow:visible!important;width:100%;gap:.6rem!important;flex-wrap:nowrap!important}
-.marks img{height:2.6rem!important;width:auto!important;mix-blend-mode:normal!important;object-fit:contain}
-.marks img.sm{height:1.9rem!important;width:3.9rem!important}
-nav{display:flex!important;flex-wrap:nowrap!important;max-width:none!important;width:100%;gap:.8rem!important;justify-content:flex-start!important;padding:0!important}
-nav a{white-space:nowrap}
-.marks .lock{display:flex;align-items:center;gap:.35rem;flex:none}
+  body { min-height: 100svh; font-family: Palatino, "Songti TC", serif; }
+  a { color: inherit; text-decoration: none; }
+  .paint { position: fixed; inset: 0; width: 100%; height: 100svh; object-fit: cover; }
+  header { position: relative; z-index: 2; padding: 0.9rem 1.15rem; }
+  header a { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  main { position: relative; z-index: 1; min-height: 100svh; margin-top: -2.8rem; display: flex; flex-direction: column; justify-content: flex-end; padding: 4.5rem 1.1rem 1.3rem; background: linear-gradient(to top, rgb(16 14 12 / 0.82), rgb(16 14 12 / 0.15) 48%, transparent 70%); }
+  .steps { display: flex; gap: 0.7rem; margin: 0; font-family: "PingFang TC", sans-serif; font-size: 0.75rem; letter-spacing: 0.14em; color: rgb(246 241 232 / 0.45); }
+  .steps .on { color: #e6c98a; }
+  h1 { margin: 0.4rem 0 0; font-size: 1.7rem; font-style: italic; font-weight: 500; line-height: 1.15; }
+  .line { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.45rem 0 0; }
+  .line:empty { display: none; }
+  .line b { color: #e6c98a; font-weight: 500; }
+  .line span { color: #cbbba6; }
+  .words { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.8rem; }
+  .word, .door, #pass { font-family: "PingFang TC", sans-serif; border: 0; color: #f6f1e8; }
+  .word { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 4.3rem; background: rgb(16 14 12 / 0.5); font-size: 1.4rem; }
+  .word small { margin-top: 0.12rem; font-size: 0.7rem; color: #efe6d8; }
+  .house { display: grid; gap: 0.45rem; margin-top: 0.85rem; }
+  .door, #pass { display: flex; align-items: center; min-height: 3.15rem; padding: 0 0.85rem; font-size: 1rem; }
+  .door { background: rgb(16 14 12 / 0.55); }
+  #pass { background: #f6f1e8; color: #100e0c; }
+  .hint { margin: 0.7rem 0 0; color: #d9cbb8; font-family: "PingFang TC", sans-serif; font-size: 0.78rem; }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
-<main class="hero">
-  <img alt="Eternal Sun — AE Universe Creation" src="/sun.jpg">
-  <div class="glow"></div>
-  <div class="sweep"></div>
-  <div class="orbit"></div>
-  <div class="scrim"></div>
-  <header>
-    <a class="marks" href="/" aria-label="AE Universe Creation"><img src="/brand/rings.png" alt=""><span class="word"><b>AE</b><small>Universe</small></span></a>
-    <nav>
-      <a href="/studio.html">桌布</a>
-      <a href="/gallery.html">Gallery</a>
-      <a href="/about.html">About</a>
-      <a href="/collect.html">Collect</a>
-    </nav>
-  </header>
-  <div class="cap">
-    <p class="brand">AE Universe Creation</p>
-    <p class="eye">Eternal Sun · 盛明</p>
-    <p class="row"><a class="enter" href="/light.html">留光</a><a class="enter" href="/studio.html">桌布</a><a class="enter" href="/gallery.html">Gallery</a></p>
-  </div>
+<img class="paint" src="/sun.jpg" alt="Eternal Sun 盛明">
+<header><a href="/">AE Universe Creation</a></header>
+<main>
+  <p class="steps"><span id="s1" class="on">留</span><span id="s2">接</span><span id="s3">入</span></p>
+  <h1 id="lead">點一個字，進來。</h1>
+  <p class="line" id="line"></p>
+  <div class="words" id="words"></div>
+  <section class="house" id="house" hidden>
+    <a class="door" href="/gallery.html">看畫</a>
+    <a class="door" href="/studio.html">桌布</a>
+    <a class="door" href="/collect.html">收藏</a>
+    <button id="pass" type="button">傳給一位朋友</button>
+    <p class="hint">朋友接上之後，就是第三輪。若這道光剛好，到 <a href="https://www.instagram.com/aeuniversecreation/">IG</a> 按一個讚。</p>
+  </section>
 </main>
+<script>
+const WORDS = [["暖","給今天"],["開","給開始"],["安","給停下"],["亮","給看見"],["近","給一個人"],["續","還會回來"]];
+const KEY = "ae-gate";
+const params = new URLSearchParams(location.search);
+const fromLink = params.has("lights");
+let lights = decode(fromLink ? params.get("lights") : localStorage.getItem(KEY) || "");
+let pick = 0;
+const mine = localStorage.getItem(KEY + "-mine") || "";
+let joined = !fromLink || (mine && lights.some((item) => item.c === mine));
+const words = document.getElementById("words");
+WORDS.forEach((word, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "word";
+  b.innerHTML = word[0] + "<small>" + word[1] + "</small>";
+  b.onclick = () => { pick = i; leaveNow(); };
+  words.appendChild(b);
+});
+function decode(raw) {
+  if (!raw) return [];
+  return raw.split(",").flatMap((part) => {
+    const [w, c] = part.split(".");
+    const n = Number(w);
+    if (!Number.isFinite(n) || n < 0 || n >= WORDS.length) return [];
+    return [{ w: n, c: c || "0" }];
+  }).slice(-6);
+}
+function encode(list) { return list.map((item) => item.w + "." + item.c).join(","); }
+function chainText() { return lights.map((item) => WORDS[item.w][0]).join(" → "); }
+function paint() {
+  const lead = document.getElementById("lead");
+  const line = document.getElementById("line");
+  const house = document.getElementById("house");
+  const friend = fromLink && !joined && lights.length;
+  const entered = lights.length > 0 && !friend;
+  document.getElementById("s1").className = "on";
+  document.getElementById("s2").className = lights.length ? "on" : "";
+  document.getElementById("s3").className = lights.length > 1 && entered ? "on" : "";
+  line.innerHTML = lights.map((item, i) => (i ? "<span>→</span>" : "") + "<b>" + WORDS[item.w][0] + "</b>").join("");
+  if (!lights.length) {
+    lead.textContent = "點一個字，進來。";
+    words.hidden = false;
+    house.hidden = true;
+    return;
+  }
+  if (friend) {
+    lead.textContent = "這條光有「" + chainText() + "」。點一個字接上。";
+    words.hidden = false;
+    house.hidden = true;
+    return;
+  }
+  words.hidden = true;
+  house.hidden = false;
+  lead.textContent = lights.length > 1
+    ? "第三輪。這條光是「" + chainText() + "」。"
+    : "第二輪。字留下了，門開了。";
+}
+function save(mark) {
+  const chain = encode(lights);
+  localStorage.setItem(KEY, chain);
+  if (mark) localStorage.setItem(KEY + "-mine", mark);
+  history.replaceState(null, "", location.pathname + (chain ? "?lights=" + encodeURIComponent(chain) : ""));
+}
+function leaveNow() {
+  if (lights.length >= 6) return;
+  const stamp = Math.random().toString(36).slice(2, 6);
+  lights.push({ w: pick, c: stamp });
+  joined = true;
+  save(stamp);
+  paint();
+}
+document.getElementById("pass").onclick = async () => {
+  const link = location.href;
+  const text = "AE Universe Creation：" + chainText();
+  if (navigator.share) {
+    try { await navigator.share({ title: "AE Universe Creation", text, url: link }); return; } catch (e) {}
+  }
+  try { await navigator.clipboard.writeText(link); } catch (e) {}
+  document.getElementById("pass").textContent = "連結複製好了";
+};
+paint();
+</script>
 </body>
 </html>
