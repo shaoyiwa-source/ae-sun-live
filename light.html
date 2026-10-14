@@ -14,20 +14,21 @@
   header { position: relative; z-index: 2; display: flex; justify-content: space-between; padding: 0.9rem 1.15rem; }
   header a { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; }
   main { position: relative; z-index: 1; min-height: 100svh; margin-top: -3.2rem; display: flex; flex-direction: column; justify-content: flex-end; padding: 5rem 1.15rem 1.4rem; background: linear-gradient(to top, rgb(16 14 12 / 0.78) 0%, rgb(16 14 12 / 0.2) 42%, transparent 68%); }
-  h1 { margin: 0; font-size: 2.6rem; font-style: italic; font-weight: 500; line-height: 0.9; }
-  .lead { margin: 0.7rem 0 0; font-family: "PingFang TC", sans-serif; font-size: 1rem; line-height: 1.5; }
-  .line { display: flex; flex-wrap: wrap; gap: 0.35rem 0.45rem; margin: 1rem 0 0; min-height: 1.6rem; }
+  h1 { margin: 0; font-size: 1.7rem; font-style: italic; font-weight: 500; line-height: 1; }
+  .lead { margin: 0.35rem 0 0; font-family: "PingFang TC", sans-serif; font-size: 0.95rem; line-height: 1.4; }
+  .line { display: flex; flex-wrap: wrap; gap: 0.35rem 0.45rem; margin: 0.45rem 0 0; }
+  .line:empty { display: none; }
+  .words { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; margin-top: 0.75rem; }
+  .word, .go { font-family: "PingFang TC", sans-serif; color: #f6f1e8; border: 0; }
+  .word { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 4.4rem; padding: 0.45rem 0.2rem; background: rgb(16 14 12 / 0.45); font-size: 1.45rem; }
+  .word small { margin-top: 0.15rem; color: #efe6d8; font-size: 0.72rem; }
+  .go { margin-top: 0.75rem; min-height: 3.1rem; padding: 0 0.2rem; background: transparent; text-align: left; font-size: 1rem; }
+  #pass { display: flex; align-items: center; width: 100%; background: #f6f1e8; color: #100e0c; padding: 0 0.9rem; }
   .line b { font-weight: 500; color: #e6c98a; }
-  .line span { color: #8a8175; }
-  .words { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 1rem; margin-top: 0.7rem; }
-  .word, .go { font-family: "PingFang TC", sans-serif; color: #f6f1e8; background: transparent; border: 0; text-align: left; }
-  .word { display: flex; justify-content: space-between; min-height: 2.9rem; padding: 0.35rem 0; border-bottom: 1px solid rgb(246 241 232 / 0.18); font-size: 1.05rem; }
-  .word small { color: #b7aa9a; font-size: 0.82rem; }
-  .word.on { color: #e6c98a; }
-  .go { margin-top: 1.15rem; min-height: 2.9rem; padding: 0; border-bottom: 1px solid #e6c98a; letter-spacing: 0.12em; font-size: 0.92rem; }
-  .next { margin-top: 1.1rem; }
+  .line span { color: #cbbba6; }
   .next p { margin: 0; font-family: "PingFang TC", sans-serif; line-height: 1.55; }
-  .row { display: flex; gap: 1.2rem; }
+  .row { display: flex; flex-direction: column; align-items: stretch; gap: 0.15rem; }
+  #card { min-height: 2.5rem; color: #efe6d8; background: transparent; }
   .card { display: block; width: min(100%, 280px); margin-top: 0.9rem; }
   .hint { margin-top: 0.45rem; color: #b7aa9a; font-family: "PingFang TC", sans-serif; font-size: 0.78rem; }
   [hidden] { display: none !important; }
@@ -41,10 +42,10 @@
 </header>
 <main>
   <h1>留光</h1>
-  <p class="lead" id="lead">選一個字，留在這條光上。</p>
+  <p class="lead" id="lead">點一個字，就留下。</p>
   <p class="line" id="line"></p>
   <div class="words" id="words"></div>
-  <button class="go" id="leave" type="button">留下這個字</button>
+  <button class="go" id="leave" type="button" hidden>留下這個字</button>
   <section class="next" id="next" hidden>
     <p id="done"></p>
     <div class="row">
@@ -82,7 +83,7 @@ WORDS.forEach((word, i) => {
   b.innerHTML = word[0] + "<small>" + word[1] + "</small>";
   b.onclick = () => {
     pick = i;
-    [...words.children].forEach((el, n) => el.classList.toggle("on", n === i));
+    leaveNow();
   };
   words.appendChild(b);
 });
@@ -104,7 +105,7 @@ function chainText() {
 }
 function showPick(on) {
   words.hidden = !on;
-  document.getElementById("leave").hidden = !on;
+  document.getElementById("leave").hidden = true;
 }
 function paint() {
   const line = document.getElementById("line");
@@ -113,7 +114,7 @@ function paint() {
   const full = lights.length >= 6;
   if (!lights.length) {
     line.textContent = "";
-    lead.textContent = "選一個字，留在這條光上。";
+    lead.textContent = "點一個字，就留下。";
     showPick(true);
     next.hidden = true;
     return;
@@ -139,7 +140,8 @@ function save(markMine) {
   if (markMine) localStorage.setItem(KEY + "-mine", markMine);
   history.replaceState(null, "", location.pathname + (chain ? "?lights=" + chain : ""));
 }
-document.getElementById("leave").onclick = () => {
+document.getElementById("leave").onclick = leaveNow;
+function leaveNow() {
   if (lights.length >= 6) return;
   const stamp = Math.random().toString(36).slice(2, 6);
   lights.push({ w: pick, c: stamp });
