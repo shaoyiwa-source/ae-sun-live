@@ -10,10 +10,8 @@
   html, body { margin: 0; background: #100e0c url("/sun.jpg") center / cover no-repeat; color: #f6f1e8; }
   body { min-height: 100svh; font-family: Palatino, "Songti TC", serif; }
   a { color: inherit; text-decoration: none; }
-  .paint { position: fixed; inset: 0; width: 100%; height: 100svh; object-fit: cover; }
-  header { position: relative; z-index: 2; padding: 0.9rem 1.15rem; }
-  header a { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; }
-  main { position: relative; z-index: 1; min-height: 100svh; margin-top: -2.8rem; display: flex; flex-direction: column; justify-content: flex-end; padding: 4.5rem 1.1rem 1.3rem; background: linear-gradient(to top, rgb(16 14 12 / 0.82), rgb(16 14 12 / 0.15) 48%, transparent 70%); }
+  .paint { display: block; width: 100%; height: 100svh; object-fit: cover; object-position: center; }
+  main { padding: 1.1rem 1.1rem 1.6rem; }
   .steps { display: flex; gap: 0.7rem; margin: 0; font-family: "PingFang TC", sans-serif; font-size: 0.75rem; letter-spacing: 0.14em; color: rgb(246 241 232 / 0.45); }
   .steps .on { color: #e6c98a; }
   h1 { margin: 0.4rem 0 0; font-size: 1.7rem; font-style: italic; font-weight: 500; line-height: 1.15; }
@@ -34,8 +32,7 @@
 </style>
 </head>
 <body>
-<img class="paint" src="/sun.jpg" alt="Eternal Sun 盛明">
-<header><a href="/">AE Universe Creation</a></header>
+<img class="paint" src="/sun.jpg" width="900" height="1245" alt="盛明">
 <main>
   <p class="steps"><span id="s1" class="on">留</span><span id="s2">接</span><span id="s3">入</span></p>
   <h1 id="lead">點一個字，進來。</h1>
