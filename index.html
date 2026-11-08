@@ -33,7 +33,7 @@
 <body>
 <header>
   <b id="brand">AE Universe Creation</b>
-  <button id="edit" type="button">改資料</button>
+  <button id="edit" type="button" hidden>完成</button>
 </header>
 <img id="cover" class="cover" alt="">
 <div class="info" id="info"></div>
@@ -47,7 +47,10 @@
 const KEY = "ae-album-v2";
 let site = { title: "AE Universe Creation", intro: "", cover: "/art/eternal-sun.jpg", photos: [] };
 let editing = false;
+let unlocked = false;
 let openId = null;
+let taps = 0;
+let tapAt = 0;
 function note(text) { document.getElementById("note").textContent = text || ""; }
 function persist() {
   try { localStorage.setItem(KEY, JSON.stringify(site)); note(""); }
@@ -76,7 +79,9 @@ function shrink(file) {
 }
 function render() {
   document.getElementById("brand").textContent = site.title || "AE Universe Creation";
-  document.getElementById("edit").textContent = editing ? "完成" : "改資料";
+  const edit = document.getElementById("edit");
+  edit.hidden = !unlocked;
+  edit.textContent = "完成";
   document.getElementById("add").hidden = !editing;
   const cover = document.getElementById("cover");
   cover.src = site.cover;
@@ -208,7 +213,34 @@ function render() {
     render();
   };
 }
-document.getElementById("edit").onclick = () => { editing = !editing; render(); };
+document.getElementById("edit").onclick = () => { editing = false; unlocked = false; render(); };
+document.getElementById("brand").onclick = () => {
+  const now = Date.now();
+  taps = now - tapAt < 1500 ? taps + 1 : 1;
+  tapAt = now;
+  if (taps < 8) return;
+  taps = 0;
+  const old = document.getElementById("gate");
+  if (old) old.remove();
+  const gate = document.createElement("form");
+  gate.id = "gate";
+  gate.className = "sheet";
+  gate.innerHTML = '<div class="bar"><button type="button" id="gate-x">關閉</button></div><label>密碼<input id="pw" type="password" autocomplete="off"></label><p class="note" id="gate-note"></p><button class="add" type="submit">進入</button>';
+  document.body.appendChild(gate);
+  document.getElementById("gate-x").onclick = () => gate.remove();
+  document.getElementById("pw").focus();
+  gate.onsubmit = (event) => {
+    event.preventDefault();
+    if (document.getElementById("pw").value === "aeuniverse22") {
+      unlocked = true;
+      editing = true;
+      gate.remove();
+      render();
+    } else {
+      document.getElementById("gate-note").textContent = "不對";
+    }
+  };
+};
 document.getElementById("add").onclick = () => document.getElementById("file").click();
 async function take(file, kind) {
   const src = await shrink(file);
