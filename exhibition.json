@@ -1,0 +1,133 @@
+{
+  "title": "AE Universe Creation",
+  "intro": "",
+  "cover": "/art/eternal-sun.jpg",
+  "photos": [
+    {
+      "id": "eternal-sun",
+      "title": "Eternal Sun",
+      "zh": "盛明",
+      "src": "/art/eternal-sun.jpg"
+    },
+    {
+      "id": "infinity-core",
+      "title": "Infinity Core",
+      "zh": "",
+      "src": "/art/infinity-core.jpg"
+    },
+    {
+      "id": "universe-heart-bloom",
+      "title": "Universe Heart Bloom",
+      "zh": "",
+      "src": "/art/universe-heart-bloom.jpg"
+    },
+    {
+      "id": "infinite-love",
+      "title": "Infinite Love",
+      "zh": "",
+      "src": "/art/infinite-love.jpg"
+    },
+    {
+      "id": "life-energy-field",
+      "title": "Life Energy Field",
+      "zh": "",
+      "src": "/art/life-energy-field.jpg"
+    },
+    {
+      "id": "life-bloom",
+      "title": "Life Bloom",
+      "zh": "",
+      "src": "/art/life-bloom.jpg"
+    },
+    {
+      "id": "joyful-world",
+      "title": "Joyful World",
+      "zh": "",
+      "src": "/art/joyful-world.jpg"
+    },
+    {
+      "id": "universe-abundance",
+      "title": "Universe Abundance",
+      "zh": "",
+      "src": "/art/universe-abundance.jpg"
+    },
+    {
+      "id": "heart-fly",
+      "title": "Heart Fly",
+      "zh": "心之飛翔",
+      "src": "/art/heart-fly.jpg"
+    },
+    {
+      "id": "heart-recovery",
+      "title": "Heart Recovery",
+      "zh": "心的復甦",
+      "src": "/art/heart-recovery.jpg"
+    },
+    {
+      "id": "love-embrace",
+      "title": "Love Embrace",
+      "zh": "愛的擁抱",
+      "src": "/art/love-embrace.jpg"
+    },
+    {
+      "id": "love-energy-field",
+      "title": "Love Energy Field",
+      "zh": "愛的能量場",
+      "src": "/art/love-energy-field.jpg"
+    },
+    {
+      "id": "colorful-flow",
+      "title": "Colorful Flow",
+      "zh": "彩色流動",
+      "src": "/art/colorful-flow.jpg"
+    },
+    {
+      "id": "natures-strength",
+      "title": "Nature's Strength",
+      "zh": "自然的力量",
+      "src": "/art/natures-strength.jpg"
+    },
+    {
+      "id": "fun-universe",
+      "title": "Fun Universe",
+      "zh": "趣味宇宙",
+      "src": "/art/fun-universe.jpg"
+    },
+    {
+      "id": "marvellous-energy-world",
+      "title": "Marvellous Energy World",
+      "zh": "",
+      "src": "/art/marvellous-energy-world.jpg"
+    },
+    {
+      "id": "expansion",
+      "title": "Expansion",
+      "zh": "",
+      "src": "/art/expansion.jpg"
+    },
+    {
+      "id": "heart-rebuild",
+      "title": "Heart Rebuild",
+      "zh": "",
+      "src": "/art/heart-rebuild.jpg"
+    },
+    {
+      "id": "flower-heart-bloom",
+      "title": "Flower Heart Bloom",
+      "zh": "",
+      "src": "/art/flower-heart-bloom.jpg"
+    },
+    {
+      "id": "heart-energy",
+      "title": "Heart Energy",
+      "zh": "",
+      "src": "/art/heart-energy.jpg"
+    },
+    {
+      "id": "infinite-love-strength",
+      "title": "Infinite Love Strength",
+      "zh": "",
+      "src": "/art/infinite-love-strength.jpg"
+    }
+  ]
+}
