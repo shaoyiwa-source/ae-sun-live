@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>展覽 · AE Universe Creation</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #f6f1e8; font-family: "PingFang TC", sans-serif; overflow: hidden; }
+  button, input { font: inherit; color: inherit; }
+  #stage { position: fixed; inset: 0; overflow: hidden; touch-action: none; }
+  #world { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center center; }
+  #frame { position: relative; }
+  #art { display: block; width: min(100vw, calc(100svh * 0.72)); height: auto; max-height: 100svh; }
+  #fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #lens { position: fixed; width: 148px; height: 148px; border-radius: 50%; border: 1px solid rgb(255 255 255 / 0.7); display: none; pointer-events: none; background: #000 center / cover no-repeat; box-shadow: 0 0 30px rgb(0 0 0 / 0.55); z-index: 4; }
+  #hud, #start { position: fixed; left: 0; right: 0; z-index: 5; }
+  #hud { bottom: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.7rem 0.8rem calc(0.7rem + env(safe-area-inset-bottom)); background: linear-gradient(to top, rgb(0 0 0 / 0.72), transparent); transition: opacity 0.4s; }
+  #hud.off { opacity: 0; pointer-events: none; }
+  #hud button, #start button { min-height: 2.6rem; padding: 0 0.7rem; border: 0; background: rgb(246 241 232 / 0.14); }
+  #hud button.on { background: rgb(246 241 232 / 0.88); color: #100e0c; }
+  #cap { width: 100%; font-family: Palatino, "Songti TC", serif; font-style: italic; }
+  #start { inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: #100e0c; }
+  #start button { min-width: 8rem; font-size: 1.1rem; }
+  #start p { margin: 0; color: #cbbba6; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="world">
+    <div id="frame">
+      <img id="art" alt="">
+      <canvas id="fx"></canvas>
+    </div>
+  </div>
+  <div id="lens"></div>
+  <div id="hud" class="off">
+    <p id="cap"></p>
+    <button type="button" id="back">離開</button>
+    <button type="button" id="glass">放大鏡</button>
+    <button type="button" id="pick">框選</button>
+    <button type="button" id="filter">濾鏡</button>
+    <button type="button" id="music">音樂</button>
+    <button type="button" id="song">換歌</button>
+  </div>
+  <input id="songfile" type="file" accept="audio/*" hidden>
+</div>
+<div id="start">
+  <p>AE Universe Creation</p>
+  <button type="button" id="go">開始展覽</button>
+</div>
+<script>
+const FILTERS = ["無", "暖", "冷", "柔", "綻"];
+let photos = [];
+let index = 0;
+let spots = [];
+let regions = [];
+let bursts = [];
+let draft = null;
+let scale = 1, panX = 0, panY = 0;
+let lensOn = false, pickOn = false, musicOn = true;
+let filterI = 0;
+let deadline = 0;
+let holding = false;
+let audioCtx, master, analyser, songEl, songNode;
+let beatUntil = 0;
+let smooth = 0;
+const pointers = new Map();
+
+const art = document.getElementById("art");
+const fx = document.getElementById("fx");
+const ctx = fx.getContext("2d");
+const world = document.getElementById("world");
+const frame = document.getElementById("frame");
+const lens = document.getElementById("lens");
+const hud = document.getElementById("hud");
+const cap = document.getElementById("cap");
+
+function loadSite() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem("ae-album-v2") || "null"); } catch (e) {}
+  if (saved && Array.isArray(saved.photos) && saved.photos.length) return Promise.resolve(saved);
+  return fetch("/exhibition.json").then((res) => res.json());
+}
+
+function foci(img) {
+  const w = 40;
+  const h = Math.max(20, Math.round(w * img.naturalHeight / img.naturalWidth));
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const g = c.getContext("2d", { willReadFrequently: true });
+  g.drawImage(img, 0, 0, w, h);
+  const data = g.getImageData(0, 0, w, h).data;
+  const cells = [];
+  const n = 8;
+  for (let gy = 0; gy < n; gy++) {
+    for (let gx = 0; gx < n; gx++) {
+      let sat = 0, lit = 0, count = 0;
+      const x0 = gx * w / n | 0, x1 = (gx + 1) * w / n | 0;
+      const y0 = gy * h / n | 0, y1 = (gy + 1) * h / n | 0;
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const i = (y * w + x) * 4;
+          const r = data[i], gg = data[i + 1], b = data[i + 2];
+          const max = Math.max(r, gg, b), min = Math.min(r, gg, b);
+          sat += max ? (max - min) / max : 0;
+          lit += max / 255;
+          count++;
+        }
+      }
+      cells.push({ x: (gx + 0.5) / n, y: (gy + 0.5) / n, score: count ? sat / count * 0.65 + lit / count * 0.35 : 0 });
+    }
+  }
+  cells.sort((a, b) => b.score - a.score);
+  const picks = [];
+  for (const cell of cells) {
+    if (picks.every((p) => Math.hypot(p.x - cell.x, p.y - cell.y) > 0.2)) picks.push(cell);
+    if (picks.length === 3) break;
+  }
+  return picks;
+}
+
+function show(i) {
+  if (!photos.length) return;
+  index = (i + photos.length) % photos.length;
+  regions = [];
+  bursts = [];
+  resetView();
+  const photo = photos[index];
+  art.alt = photo.title || "";
+  art.onload = () => {
+    fx.width = art.naturalWidth;
+    fx.height = art.naturalHeight;
+    spots = foci(art);
+  };
+  art.src = photo.src;
+  const sec = Math.max(2, Number(photo.seconds) || 8);
+  deadline = performance.now() + sec * 1000;
+  cap.textContent = (photo.title || "") + (photo.zh ? "  " + photo.zh : "") + "  ·  " + sec + " 秒";
+}
+
+function resetView() {
+  scale = 1; panX = 0; panY = 0;
+  world.style.transform = "translate(-50%, -50%)";
+}
+
+function paint(now) {
+  const w = fx.width, h = fx.height;
+  ctx.clearRect(0, 0, w, h);
+  const energy = level();
+  const beat = now < beatUntil;
+  const rgb = [[70, 210, 120], [220, 50, 60], [60, 110, 240]];
+  ctx.globalCompositeOperation = "lighter";
+  spots.forEach((spot, n) => {
+    const color = rgb[(n + (beat ? 1 : 0) + Math.floor(now / 700)) % 3];
+    const rad = w * (0.16 + energy * 0.22);
+    const cx = spot.x * w, cy = spot.y * h;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    grad.addColorStop(0, "rgba(" + color[0] + "," + color[1] + "," + color[2] + "," + (0.28 + energy * 0.55) + ")");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  bursts.forEach((b) => {
+    const age = (now - b.t) / 700;
+    if (age >= 1) return;
+    const color = rgb[b.n % 3];
+    const rad = w * 0.08 * (1 + age * 2);
+    ctx.fillStyle = "rgba(" + color.join(",") + "," + (1 - age) * 0.7 + ")";
+    ctx.beginPath();
+    ctx.arc(b.x * w, b.y * h, rad, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  bursts = bursts.filter((b) => now - b.t < 700);
+  regions.forEach((r) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(r.x * w, r.y * h, r.w * w, r.h * h);
+    ctx.clip();
+    const tint = { 暖: "rgba(255,160,60,0.35)", 冷: "rgba(70,120,255,0.32)", 柔: "rgba(255,240,220,0.28)", 綻: "rgba(255,80,160,0.3)" }[r.filter];
+    if (tint) { ctx.fillStyle = tint; ctx.fillRect(0, 0, w, h); }
+    const cx = (r.x + r.w / 2) * w, cy = (r.y + r.h / 2) * h;
+    const color = rgb[Math.floor(now / 500) % 3];
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(r.w, r.h) * w * 0.7);
+    grad.addColorStop(0, "rgba(" + color.join(",") + "," + (0.45 + energy * 0.4) + ")");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  });
+  if (draft) {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = "rgba(246,241,232,0.9)";
+    ctx.lineWidth = Math.max(2, w / 180);
+    ctx.strokeRect(draft.x * w, draft.y * h, draft.w * w, draft.h * h);
+  }
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function level() {
+  if (!analyser) return 0.25;
+  const bins = analyser.frequencyBinCount;
+  const data = new Uint8Array(bins);
+  analyser.getByteFrequencyData(data);
+  let low = 0;
+  for (let i = 0; i < 10; i++) low += data[i];
+  const e = low / (10 * 255);
+  if (e > smooth * 1.35 && e > 0.18) beatUntil = performance.now() + 160;
+  smooth = smooth * 0.85 + e * 0.15;
+  return Math.min(1, e * 1.8);
+}
+
+function loop(now) {
+  const quiet = !holding && scale < 1.08 && !pickOn;
+  if (quiet && now > deadline && photos.length) show(index + 1);
+  paint(now);
+  requestAnimationFrame(loop);
+}
+
+function norm(x, y) {
+  const r = frame.getBoundingClientRect();
+  return {
+    x: Math.min(1, Math.max(0, (x - r.left) / r.width)),
+    y: Math.min(1, Math.max(0, (y - r.top) / r.height))
+  };
+}
+
+function applyView() {
+  world.style.transform = "translate(-50%, -50%) translate(" + panX + "px," + panY + "px) scale(" + scale + ")";
+}
+
+function startMusic() {
+  audioCtx = new AudioContext();
+  master = audioCtx.createGain();
+  master.gain.value = 0.22;
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  master.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 900;
+  const bed = audioCtx.createGain();
+  bed.gain.value = 0.16;
+  [196, 247, 294].forEach((freq, n) => {
+    const osc = audioCtx.createOscillator();
+    osc.type = n === 2 ? "triangle" : "sine";
+    osc.frequency.value = freq;
+    osc.connect(filter);
+    osc.start();
+  });
+  filter.connect(bed);
+  bed.connect(master);
+  const scale = [262, 294, 330, 392, 440, 330, 294];
+  let step = 0;
+  setInterval(() => {
+    if (!musicOn || songEl) return;
+    const osc = audioCtx.createOscillator();
+    const env = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = scale[step % scale.length];
+    env.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    env.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.08);
+    env.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.5);
+    osc.connect(env);
+    env.connect(master);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.6);
+    beatUntil = performance.now() + 180;
+    step++;
+  }, 1200);
+}
+
+function useSong(file) {
+  if (!audioCtx) return;
+  if (songEl) { songEl.pause(); songNode.disconnect(); }
+  songEl = new Audio(URL.createObjectURL(file));
+  songEl.loop = true;
+  songNode = audioCtx.createMediaElementSource(songEl);
+  songNode.connect(master);
+  songEl.play();
+}
+
+let hudTimer = 0;
+function wake() {
+  hud.classList.remove("off");
+  clearTimeout(hudTimer);
+  hudTimer = setTimeout(() => hud.classList.add("off"), 3500);
+}
+
+document.getElementById("go").onclick = () => {
+  document.getElementById("start").remove();
+  startMusic();
+  show(0);
+  wake();
+  requestAnimationFrame(loop);
+};
+document.getElementById("back").onclick = () => { location.href = "/"; };
+document.getElementById("glass").onclick = () => {
+  lensOn = !lensOn;
+  document.getElementById("glass").classList.toggle("on", lensOn);
+  if (!lensOn) lens.style.display = "none";
+  wake();
+};
+document.getElementById("pick").onclick = () => {
+  pickOn = !pickOn;
+  document.getElementById("pick").classList.toggle("on", pickOn);
+  wake();
+};
+document.getElementById("filter").onclick = () => {
+  filterI = (filterI + 1) % FILTERS.length;
+  document.getElementById("filter").textContent = "濾鏡 " + FILTERS[filterI];
+  if (regions.length) regions[regions.length - 1].filter = FILTERS[filterI];
+  wake();
+};
+document.getElementById("music").onclick = () => {
+  musicOn = !musicOn;
+  if (master) master.gain.value = musicOn ? 0.22 : 0;
+  document.getElementById("music").classList.toggle("on", musicOn);
+  wake();
+};
+document.getElementById("song").onclick = () => document.getElementById("songfile").click();
+document.getElementById("songfile").onchange = (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (file) useSong(file);
+  wake();
+};
+document.getElementById("music").classList.add("on");
+
+let pinch = null;
+stageEvents();
+function stageEvents() {
+  const stage = document.getElementById("stage");
+  stage.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("#hud")) return;
+    holding = true;
+    wake();
+    stage.setPointerCapture(event.pointerId);
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, ox: event.clientX, oy: event.clientY });
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, s: scale, x: panX, y: panY, mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+    } else if (pickOn && scale > 1.05) {
+      const p = norm(event.clientX, event.clientY);
+      draft = { x: p.x, y: p.y, w: 0, h: 0 };
+    }
+  });
+  stage.addEventListener("pointermove", (event) => {
+    if (!pointers.has(event.pointerId)) {
+      moveLens(event.clientX, event.clientY);
+      return;
+    }
+    const prev = pointers.get(event.pointerId);
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, ox: prev.ox, oy: prev.oy });
+    moveLens(event.clientX, event.clientY);
+    if (pointers.size === 2 && pinch) {
+      const [a, b] = [...pointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      scale = Math.min(6, Math.max(1, pinch.s * d / pinch.d));
+      panX = pinch.x + (a.x + b.x) / 2 - pinch.mx;
+      panY = pinch.y + (a.y + b.y) / 2 - pinch.my;
+      applyView();
+      return;
+    }
+    if (draft) {
+      const p = norm(event.clientX, event.clientY);
+      draft.w = p.x - draft.x;
+      draft.h = p.y - draft.y;
+      return;
+    }
+    if (scale > 1.05 && pointers.size === 1) {
+      panX += event.clientX - prev.x;
+      panY += event.clientY - prev.y;
+      pointers.get(event.pointerId).ox = prev.ox;
+      applyView();
+    }
+    const p = norm(event.clientX, event.clientY);
+    bursts.push({ x: p.x, y: p.y, t: performance.now(), n: bursts.length });
+  });
+  stage.addEventListener("pointerup", (event) => {
+    const start = pointers.get(event.pointerId);
+    pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinch = null;
+    holding = pointers.size > 0;
+    if (draft && Math.abs(draft.w) > 0.04 && Math.abs(draft.h) > 0.04) {
+      const x = Math.min(draft.x, draft.x + draft.w);
+      const y = Math.min(draft.y, draft.y + draft.h);
+      regions.push({ x, y, w: Math.abs(draft.w), h: Math.abs(draft.h), filter: FILTERS[filterI] });
+    }
+    draft = null;
+    if (start && Math.hypot(event.clientX - start.ox, event.clientY - start.oy) < 12 && !pickOn) {
+      const p = norm(event.clientX, event.clientY);
+      bursts.push({ x: p.x, y: p.y, t: performance.now(), n: 1 });
+    }
+  });
+}
+
+function moveLens(x, y) {
+  if (!lensOn) return;
+  const r = frame.getBoundingClientRect();
+  const px = (x - r.left) / r.width;
+  const py = (y - r.top) / r.height;
+  lens.style.display = "block";
+  lens.style.left = x - 74 + "px";
+  lens.style.top = y - 74 + "px";
+  lens.style.backgroundImage = "url(" + art.src + ")";
+  lens.style.backgroundSize = r.width * 2.4 + "px " + r.height * 2.4 + "px";
+  lens.style.backgroundPosition = (74 - px * r.width * 2.4) + "px " + (74 - py * r.height * 2.4) + "px";
+}
+
+loadSite().then((site) => {
+  photos = (site.photos || []).filter((photo) => photo && photo.src);
+  if (!photos.length && site.cover) photos = [{ title: site.title || "", src: site.cover, seconds: 8 }];
+});
+</script>
+</body>
+</html>
