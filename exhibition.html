@@ -48,6 +48,7 @@
     <button type="button" id="record">記錄</button>
     <button type="button" id="music">音樂</button>
     <label class="slide">光<input id="light" type="range" min="0" max="100" value="40"></label>
+    <button type="button" id="mode" class="on">自然</button>
     <label class="slide">聲<input id="vol" type="range" min="0" max="100" value="50"></label>
     <button type="button" id="song">換歌</button>
   </div>
@@ -76,6 +77,14 @@ let draft = null;
 let scale = 1, panX = 0, panY = 0;
 let lensOn = false, pickOn = false, musicOn = true;
 let lightLevel = 0.4;
+let lightMode = "natural";
+const wanderers = [0, 1, 2, 3, 4].map((i) => ({
+  x: 0.18 + (i % 3) * 0.3,
+  y: 0.22 + Math.floor(i / 3) * 0.4,
+  tx: 0.2 + (i * 0.17) % 0.6,
+  ty: 0.25 + (i * 0.23) % 0.5,
+  next: 0
+}));
 let volume = 0.16;
 let paths = [];
 let filterI = 0;
@@ -194,10 +203,29 @@ function paint(now) {
   const beat = now < beatUntil;
   const rgb = [[70, 210, 120], [220, 50, 60], [60, 110, 240]];
   ctx.globalCompositeOperation = "lighter";
-  if (lightLevel > 0.01) {
+  if (lightLevel > 0.01 && lightMode === "natural") {
+    wanderers.forEach((lamp, n) => {
+      if (now > lamp.next) {
+        lamp.tx = 0.1 + Math.random() * 0.8;
+        lamp.ty = 0.1 + Math.random() * 0.8;
+        lamp.next = now + 1600 + Math.random() * 2400;
+      }
+      lamp.x += (lamp.tx - lamp.x) * 0.01;
+      lamp.y += (lamp.ty - lamp.y) * 0.01;
+      const color = rgb[(n + Math.floor(now / 1100)) % 3];
+      const rad = w * (0.055 + energy * 0.02);
+      const alpha = lightLevel * 0.18 * (0.65 + energy);
+      const grad = ctx.createRadialGradient(lamp.x * w, lamp.y * h, 0, lamp.x * w, lamp.y * h, rad);
+      grad.addColorStop(0, "rgba(" + color[0] + "," + color[1] + "," + color[2] + "," + alpha + ")");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(lamp.x * w, lamp.y * h, rad, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  } else if (lightLevel > 0.01) {
     paths.forEach((path, n) => {
       const color = rgb[(n + (beat ? 1 : 0) + Math.floor(now / 900)) % 3];
-      const head = along(path, now / 1000 * (0.045 + n * 0.012));
       for (let k = 0; k < 8; k++) {
         const p = along(path, now / 1000 * (0.045 + n * 0.012) - k * 0.018);
         const rad = w * (0.035 + energy * 0.012 - k * 0.002);
@@ -211,7 +239,6 @@ function paint(now) {
         ctx.arc(p.x * w, p.y * h, rad, 0, Math.PI * 2);
         ctx.fill();
       }
-      void head;
     });
   }
   bursts.forEach((b) => {
@@ -463,6 +490,11 @@ document.getElementById("songfile").onchange = (event) => {
 };
 document.getElementById("music").classList.add("on");
 document.getElementById("light").oninput = (event) => { lightLevel = Number(event.target.value) / 100; wake(); };
+document.getElementById("mode").onclick = () => {
+  lightMode = lightMode === "natural" ? "focus" : "natural";
+  document.getElementById("mode").textContent = lightMode === "natural" ? "自然" : "焦點";
+  wake();
+};
 document.getElementById("vol").oninput = (event) => {
   volume = Number(event.target.value) / 100 * 0.32;
   musicOn = volume > 0.005;
