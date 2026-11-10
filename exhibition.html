@@ -21,6 +21,10 @@
   #cap { width: 100%; font-family: Palatino, "Songti TC", serif; font-style: italic; }
   #start { inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: #100e0c; }
   #start button { min-width: 8rem; font-size: 1.1rem; }
+  #film { position: fixed; inset: 0; z-index: 8; background: #100e0c; display: flex; flex-direction: column; gap: 0.6rem; padding: 1rem; }
+  #film[hidden] { display: none; }
+  #film video { width: 100%; max-height: 70svh; background: #000; }
+  #film .row { display: flex; gap: 0.4rem; }
   #start p { margin: 0; color: #cbbba6; }
 </style>
 </head>
@@ -39,10 +43,19 @@
     <button type="button" id="glass">放大鏡</button>
     <button type="button" id="pick">框選</button>
     <button type="button" id="filter">濾鏡</button>
+    <button type="button" id="record">記錄</button>
     <button type="button" id="music">音樂</button>
     <button type="button" id="song">換歌</button>
   </div>
   <input id="songfile" type="file" accept="audio/*" hidden>
+</div>
+<div id="film" hidden>
+  <video id="filmview" playsinline controls></video>
+  <div class="row">
+    <button type="button" id="save">下載</button>
+    <button type="button" id="share">分享</button>
+    <button type="button" id="filmclose">關閉</button>
+  </div>
 </div>
 <div id="start">
   <p>AE Universe Creation</p>
@@ -61,7 +74,7 @@ let lensOn = false, pickOn = false, musicOn = true;
 let filterI = 0;
 let deadline = 0;
 let holding = false;
-let audioCtx, master, analyser, songEl, songNode;
+let audioCtx, master, analyser, audioDest, songEl, songNode;
 let beatUntil = 0;
 let smooth = 0;
 const pointers = new Map();
@@ -215,6 +228,7 @@ function loop(now) {
   const quiet = !holding && scale < 1.08 && !pickOn;
   if (quiet && now > deadline && photos.length) show(index + 1);
   paint(now);
+  if (recording) grabFrame();
   requestAnimationFrame(loop);
 }
 
@@ -238,6 +252,8 @@ function startMusic() {
   analyser.fftSize = 256;
   master.connect(analyser);
   analyser.connect(audioCtx.destination);
+  audioDest = audioCtx.createMediaStreamDestination();
+  master.connect(audioDest);
   const filter = audioCtx.createBiquadFilter();
   filter.type = "lowpass";
   filter.frequency.value = 900;
@@ -281,6 +297,84 @@ function useSong(file) {
   songNode.connect(master);
   songEl.play();
 }
+
+let recorder, recChunks, recCanvas, recCtx, recording = false;
+function grabFrame() {
+  const stage = document.getElementById("stage");
+  const w = 720;
+  const h = Math.max(1, Math.round(w * stage.clientHeight / stage.clientWidth));
+  if (!recCanvas) {
+    recCanvas = document.createElement("canvas");
+    recCtx = recCanvas.getContext("2d");
+  }
+  if (recCanvas.width !== w || recCanvas.height !== h) {
+    recCanvas.width = w;
+    recCanvas.height = h;
+  }
+  const s = w / stage.clientWidth;
+  const st = stage.getBoundingClientRect();
+  const r = frame.getBoundingClientRect();
+  recCtx.fillStyle = "#000";
+  recCtx.fillRect(0, 0, w, h);
+  if (art.naturalWidth) recCtx.drawImage(art, (r.left - st.left) * s, (r.top - st.top) * s, r.width * s, r.height * s);
+  recCtx.drawImage(fx, (r.left - st.left) * s, (r.top - st.top) * s, r.width * s, r.height * s);
+}
+function filmType() {
+  const types = ["video/mp4", "video/webm;codecs=vp8,opus", "video/webm"];
+  return types.find((type) => window.MediaRecorder && MediaRecorder.isTypeSupported(type)) || "";
+}
+function startRec() {
+  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+    cap.textContent = "這台手機沒辦法錄成影片。";
+    return;
+  }
+  grabFrame();
+  const stream = recCanvas.captureStream(30);
+  if (audioDest) audioDest.stream.getAudioTracks().forEach((track) => stream.addTrack(track));
+  const type = filmType();
+  recorder = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 2500000 } : undefined);
+  recChunks = [];
+  recorder.ondataavailable = (event) => { if (event.data && event.data.size) recChunks.push(event.data); };
+  recorder.onstop = () => finishRec(recorder.mimeType || type || "video/webm");
+  recorder.start(250);
+  recording = true;
+  document.getElementById("record").textContent = "停止";
+  document.getElementById("record").classList.add("on");
+}
+function stopRec() {
+  recording = false;
+  if (recorder && recorder.state !== "inactive") recorder.stop();
+  document.getElementById("record").textContent = "記錄";
+  document.getElementById("record").classList.remove("on");
+}
+function finishRec(type) {
+  const blob = new Blob(recChunks, { type });
+  const ext = type.includes("mp4") ? "mp4" : "webm";
+  const file = new File([blob], "AE-exhibition." + ext, { type });
+  const url = URL.createObjectURL(blob);
+  const view = document.getElementById("filmview");
+  view.src = url;
+  view.play().catch(() => {});
+  document.getElementById("film").hidden = false;
+  document.getElementById("save").onclick = () => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    a.click();
+  };
+  document.getElementById("share").onclick = () => {
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: "AE Universe Creation" }).catch(() => {});
+    } else {
+      document.getElementById("save").onclick();
+    }
+  };
+}
+document.getElementById("record").onclick = () => { recording ? stopRec() : startRec(); wake(); };
+document.getElementById("filmclose").onclick = () => {
+  document.getElementById("filmview").pause();
+  document.getElementById("film").hidden = true;
+};
 
 let hudTimer = 0;
 function wake() {
